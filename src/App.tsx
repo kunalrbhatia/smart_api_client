@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import {
   Button,
@@ -55,10 +55,6 @@ function App() {
   const onScripAddClick = (event: object, row: object, i: number) => {
     console.log(row);
   };
-  useEffect(() => {
-    console.log('fetchedScrips:', fetchedScrips);
-  }, [fetchedScrips]);
-
   /* const socket: WebSocket = new WebSocket('ws://localhost:5000');
   socket.addEventListener('open', (evt: any) => {
     console.log('server connected');
