@@ -4,45 +4,51 @@ import { Autocomplete, Paper, TextField } from '@mui/material';
 import axios from 'axios';
 import * as _ from 'lodash';
 function App() {
-  const [data, setData] = useState<string>('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [autoCompleteData, setAutoCompleteData] = useState<object[]>([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        await axios
-          .get(
-            'https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json'
-          )
-          .then((response: object) => {
-            let acData: object[] = _.get(response, 'data', []) || [];
-            let newData: object[] = [];
-            acData.forEach((elm, idx) => {
-              if (idx < 100) {
-                if (isNaN(_.get(elm, 'name', ''))) newData.push(elm);
-              }
-            });
-            setAutoCompleteData(
-              newData.map((elm, i) => {
-                return {
-                  ...elm,
-                  label: _.get(elm, 'name', '') || '',
-                  key: '0' + i,
-                };
-              })
-            );
-          })
-          .catch((evt: object) => {
-            console.log(evt);
-          });
-      } catch (error) {
-        console.error(_.get(error, 'message', '') || '');
-      }
-      setLoading(false);
+  const [autoCompleteInputValue, setAutoCompleteInputValue] =
+    useState<string>('');
+  const fetchDataForAutoComplete = async (scriptName: string) => {
+    setLoading(true);
+    const payload = JSON.stringify({
+      scriptName: scriptName.toLocaleUpperCase(),
+    });
+    const config = {
+      method: 'post',
+      url: 'http://localhost:5000/scrip/details/get-script',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: payload,
     };
-    fetchData();
-  }, []);
+    try {
+      await axios(config)
+        .then((response: object) => {
+          setLoading(false);
+          setAutoCompleteData(_.get(response, 'data', []) || []);
+        })
+        .catch((err) => {
+          setLoading(false);
+          console.log(err);
+        });
+    } catch (err) {
+      setLoading(false);
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    console.log('autoCompleteData: ', autoCompleteData);
+  }, [autoCompleteData]);
+  const onAutoCompleteInputChange = (
+    _event: React.SyntheticEvent,
+    value: string,
+    reason: string
+  ) => {
+    setAutoCompleteInputValue(value);
+    if (reason !== 'reset') fetchDataForAutoComplete(value);
+  };
 
   /* const socket: WebSocket = new WebSocket('ws://localhost:5000');
   socket.addEventListener('open', (evt: any) => {
@@ -60,9 +66,13 @@ function App() {
       >
         {/* <div>{data}</div> */}
         <Autocomplete
+          disabled={loading}
           disablePortal
+          inputValue={autoCompleteInputValue}
+          onInputChange={onAutoCompleteInputChange}
           id="combo-box-demo"
           options={autoCompleteData}
+          loadingText="Loading..."
           sx={{ width: 500 }}
           renderInput={(params) => {
             return <TextField {...params} label="Symbol" />;
