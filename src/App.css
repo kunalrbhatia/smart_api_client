@@ -1,3 +1,13 @@
 .App {
   padding: 20px;
 }
+.scripTextField {
+  margin-right: 8px !important;
+}
+.scripBox {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 16px;
+}

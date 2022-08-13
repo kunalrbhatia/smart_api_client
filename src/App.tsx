@@ -1,17 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import { Autocomplete, Paper, TextField } from '@mui/material';
+import {
+  Button,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+} from '@mui/material';
 import axios from 'axios';
 import * as _ from 'lodash';
 function App() {
   const [loading, setLoading] = useState(false);
-  const [autoCompleteData, setAutoCompleteData] = useState<object[]>([]);
-  const [autoCompleteInputValue, setAutoCompleteInputValue] =
-    useState<string>('');
-  const fetchDataForAutoComplete = async (scriptName: string) => {
+  const [scriptInput, setScriptInput] = useState<string>('');
+  const [fetchedScrips, setFetchedScrips] = useState<object[]>([]);
+  const fetchDataForAutoComplete = async () => {
     setLoading(true);
     const payload = JSON.stringify({
-      scriptName: scriptName.toLocaleUpperCase(),
+      scriptName: scriptInput.toLocaleUpperCase(),
     });
     const config = {
       method: 'post',
@@ -25,7 +34,7 @@ function App() {
       await axios(config)
         .then((response: object) => {
           setLoading(false);
-          setAutoCompleteData(_.get(response, 'data', []) || []);
+          setFetchedScrips(_.get(response, 'data', []) || []);
         })
         .catch((err) => {
           setLoading(false);
@@ -38,17 +47,13 @@ function App() {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    console.log('autoCompleteData: ', autoCompleteData);
-  }, [autoCompleteData]);
-  const onAutoCompleteInputChange = (
-    _event: React.SyntheticEvent,
-    value: string,
-    reason: string
-  ) => {
-    setAutoCompleteInputValue(value);
-    if (reason !== 'reset') fetchDataForAutoComplete(value);
+  const onScripInputChange = (event: object) => {
+    const changedInput = _.get(event, 'target.value', '') || '';
+    setScriptInput(changedInput);
   };
+  useEffect(() => {
+    console.log('fetchedScrips:', fetchedScrips);
+  }, [fetchedScrips]);
 
   /* const socket: WebSocket = new WebSocket('ws://localhost:5000');
   socket.addEventListener('open', (evt: any) => {
@@ -62,22 +67,61 @@ function App() {
     <div className="App">
       <Paper
         elevation={3}
-        style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}
+        style={{
+          padding: '20px',
+          display: 'flex',
+          justifyContent: 'center',
+          flexDirection: 'column',
+        }}
       >
         {/* <div>{data}</div> */}
-        <Autocomplete
-          disabled={loading}
-          disablePortal
-          inputValue={autoCompleteInputValue}
-          onInputChange={onAutoCompleteInputChange}
-          id="combo-box-demo"
-          options={autoCompleteData}
-          loadingText="Loading..."
-          sx={{ width: 500 }}
-          renderInput={(params) => {
-            return <TextField {...params} label="Symbol" />;
-          }}
-        />
+        <div className="scripBox">
+          <TextField
+            label="Scrip"
+            variant="standard"
+            disabled={loading}
+            onChange={onScripInputChange}
+            value={scriptInput}
+            fullWidth
+            className="scripTextField"
+          />
+          <Button onClick={fetchDataForAutoComplete} variant="contained">
+            Search
+          </Button>
+        </div>
+        <div>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>SYMBOL</TableCell>
+                  <TableCell>NAME</TableCell>
+                  <TableCell>EXPIRY</TableCell>
+                  <TableCell>LOTSIZE</TableCell>
+                  <TableCell>INSTRUMENT TYPE</TableCell>
+                  <TableCell>EXCHANGE SEGMENT</TableCell>
+                  <TableCell>TOKEN</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {fetchedScrips.length > 0 &&
+                  fetchedScrips.map((row) => (
+                    <TableRow key={_.get(row, 'token', '') || ''}>
+                      <TableCell>{_.get(row, 'symbol', '') || ''}</TableCell>
+                      <TableCell>{_.get(row, 'name', '') || ''}</TableCell>
+                      <TableCell>{_.get(row, 'expiry', '') || ''}</TableCell>
+                      <TableCell>{_.get(row, 'lotsize', '') || ''}</TableCell>
+                      <TableCell>
+                        {_.get(row, 'instrumenttype', '') || ''}
+                      </TableCell>
+                      <TableCell>{_.get(row, 'exch_seg', '') || ''}</TableCell>
+                      <TableCell>{_.get(row, 'token', '') || ''}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
       </Paper>
     </div>
   );
