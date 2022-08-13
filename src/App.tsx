@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import * as _ from 'lodash';
+import AddIcon from '@mui/icons-material/Add';
 function App() {
   const [loading, setLoading] = useState(false);
   const [scriptInput, setScriptInput] = useState<string>('');
@@ -50,6 +51,9 @@ function App() {
   const onScripInputChange = (event: object) => {
     const changedInput = _.get(event, 'target.value', '') || '';
     setScriptInput(changedInput);
+  };
+  const onScripAddClick = (event: object, row: object, i: number) => {
+    console.log(row);
   };
   useEffect(() => {
     console.log('fetchedScrips:', fetchedScrips);
@@ -101,11 +105,12 @@ function App() {
                   <TableCell>INSTRUMENT TYPE</TableCell>
                   <TableCell>EXCHANGE SEGMENT</TableCell>
                   <TableCell>TOKEN</TableCell>
+                  <TableCell>ACTION</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {fetchedScrips.length > 0 &&
-                  fetchedScrips.map((row) => (
+                  fetchedScrips.map((row, i) => (
                     <TableRow key={_.get(row, 'token', '') || ''}>
                       <TableCell>{_.get(row, 'symbol', '') || ''}</TableCell>
                       <TableCell>{_.get(row, 'name', '') || ''}</TableCell>
@@ -116,6 +121,19 @@ function App() {
                       </TableCell>
                       <TableCell>{_.get(row, 'exch_seg', '') || ''}</TableCell>
                       <TableCell>{_.get(row, 'token', '') || ''}</TableCell>
+                      <TableCell>
+                        <Button
+                          id={`addButton_${i}`}
+                          variant="contained"
+                          disabled={false}
+                          color="success"
+                          onClick={(event) => {
+                            onScripAddClick(event, row, i);
+                          }}
+                        >
+                          <AddIcon /> <div style={{ marginLeft: 8 }}>Add</div>
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
               </TableBody>

@@ -4,6 +4,9 @@
 .scripTextField {
   margin-right: 8px !important;
 }
+.scripaddbutton {
+  background-color: green !important;
+}
 .scripBox {
   display: flex;
   flex-direction: row;
