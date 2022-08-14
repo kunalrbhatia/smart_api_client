@@ -14,3 +14,18 @@
   width: 100%;
   margin-bottom: 16px;
 }
+.arbitrageButton {
+  margin-top: 16px !important;
+  margin-bottom: 16px !important;
+}
+.arbitrageData {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.arbitrageRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

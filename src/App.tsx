@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import {
   Button,
@@ -10,6 +10,7 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Typography,
 } from '@mui/material';
 import axios from 'axios';
 import * as _ from 'lodash';
@@ -18,6 +19,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [scriptInput, setScriptInput] = useState<string>('');
   const [fetchedScrips, setFetchedScrips] = useState<object[]>([]);
+  const [currentToSpot, setCurrentToStop] = useState<number>(0);
+  const [nextToSpot, setNextToStop] = useState<number>(0);
+  const [isGoodOpportunity, setIsGoodOpportunity] = useState<boolean>(false);
+  const [isOrderNowDisabled, setIsOrderNowDisabled] = useState<boolean>(true);
   const fetchDataForAutoComplete = async () => {
     setLoading(true);
     const payload = JSON.stringify({
@@ -55,14 +60,47 @@ function App() {
   const onScripAddClick = (event: object, row: object, i: number) => {
     console.log(row);
   };
-  /* const socket: WebSocket = new WebSocket('ws://localhost:5000');
-  socket.addEventListener('open', (evt: any) => {
-    console.log('server connected');
-  });
-  socket.addEventListener('message', (evt: any) => {
-    console.log(evt.data);
-    //setData(_.get(JSON.parse(evt.data)[0], 'tvalue', 'no value') || 'no value');
-  }); */
+  const onArbitrageClick = async (event: object) => {
+    setLoading(true);
+    const config = {
+      method: 'get',
+      url: 'http://localhost:5000/arbitrage',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    try {
+      await axios(config)
+        .then((response: object) => {
+          type responseData = {
+            currentToSpot: number;
+            nextToCurrent: number;
+            isGoodOpportunity: boolean;
+            status: string;
+          };
+          const data: responseData = _.get(response, 'data', null) || null;
+          if (data && data.status === 'ok') {
+            if (data.isGoodOpportunity) setIsOrderNowDisabled(false);
+            else setIsOrderNowDisabled(true);
+            setCurrentToStop(data.currentToSpot);
+            setNextToStop(data.nextToCurrent);
+            setIsGoodOpportunity(data.isGoodOpportunity);
+            setLoading(false);
+          } else {
+            setIsOrderNowDisabled(true);
+          }
+        })
+        .catch((err) => {
+          setLoading(false);
+          console.log(err);
+        });
+    } catch (err) {
+      setLoading(false);
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="App">
       <Paper
@@ -74,7 +112,6 @@ function App() {
           flexDirection: 'column',
         }}
       >
-        {/* <div>{data}</div> */}
         <div className="scripBox">
           <TextField
             label="Scrip"
@@ -90,8 +127,8 @@ function App() {
           </Button>
         </div>
         <div>
-          <TableContainer>
-            <Table>
+          <TableContainer sx={{ maxHeight: 440 }}>
+            <Table stickyHeader>
               <TableHead>
                 <TableRow>
                   <TableCell>SYMBOL</TableCell>
@@ -135,6 +172,42 @@ function App() {
               </TableBody>
             </Table>
           </TableContainer>
+        </div>
+        <div className="arbitrageButton">
+          <Button fullWidth variant="contained" onClick={onArbitrageClick}>
+            Get arbitrage data
+          </Button>
+        </div>
+        <div className="arbitrageData">
+          <div className="arbitrageRow">
+            <Typography variant="body1" marginRight={1}>
+              <b>Current To Spot</b>
+            </Typography>
+            <Typography variant="body1">{currentToSpot}</Typography>
+          </div>
+          <div className="arbitrageRow">
+            <Typography variant="body1" marginRight={1}>
+              <b>Next To Current</b>
+            </Typography>
+            <Typography variant="body1">{nextToSpot}</Typography>
+          </div>
+          <div className="arbitrageRow">
+            <Typography variant="body1" marginRight={1}>
+              <b>Is Good Opportunity?</b>
+            </Typography>
+            <Typography variant="body1">
+              {isGoodOpportunity ? 'Yes' : 'No'}
+            </Typography>
+          </div>
+          <div className="arbitrageRow">
+            <Button
+              variant="contained"
+              color="success"
+              disabled={isOrderNowDisabled}
+            >
+              Order Now
+            </Button>
+          </div>
         </div>
       </Paper>
     </div>
