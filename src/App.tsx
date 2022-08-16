@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import {
   Button,
@@ -57,10 +57,10 @@ function App() {
     const changedInput = _.get(event, 'target.value', '') || '';
     setScriptInput(changedInput);
   };
-  const onScripAddClick = (event: object, row: object, i: number) => {
+  const onScripAddClick = (__event: object, row: object, _i: number) => {
     console.log(row);
   };
-  const onArbitrageClick = async (event: object) => {
+  const onArbitrageClick = async () => {
     setLoading(true);
     const config = {
       method: 'get',
