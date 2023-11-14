@@ -17,6 +17,7 @@ import {
 import axios from 'axios';
 import * as _ from 'lodash';
 import TableInput, { SelectedValue } from './components/TableInput/TableInput';
+import { GET_STOCK, ORB_ALGO } from './constants';
 function App() {
   const [loading, setLoading] = useState(false);
   const [selected_scrips, setSelected_scrips] =
@@ -27,7 +28,7 @@ function App() {
     setLoading(true);
     const config = {
       method: 'post',
-      url: 'http://localhost:8000/orb',
+      url: ORB_ALGO,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -62,7 +63,7 @@ function App() {
     });
     const config = {
       method: 'post',
-      url: 'http://localhost:8000/stock',
+      url: GET_STOCK,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -233,14 +234,16 @@ function App() {
           </TableContainer>
         </div>
       </Paper>
-      <TableInput
-        data={selected_scrips}
-        onSubmit={async (data) => {
-          setInterval(() => {
-            scheduleAlgo(data);
-          }, 900000);
-        }}
-      />
+      {Array.isArray(selected_scrips) && selected_scrips.length > 0 && (
+        <TableInput
+          data={selected_scrips}
+          onSubmit={async (data) => {
+            setInterval(() => {
+              scheduleAlgo(data);
+            }, 900000);
+          }}
+        />
+      )}
     </div>
   );
 }

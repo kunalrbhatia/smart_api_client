@@ -59,8 +59,7 @@ const TableInput: React.FC<TableComponentProps> = ({ data, onSubmit }) => {
               const classes = isLast
                 ? 'p-4'
                 : 'p-4 border-b border-blue-gray-50';
-              editedData[index].symbol = item.symbol;
-              editedData[index].token = item.token;
+              editedData.push({ symbol: item.symbol, token: item.token });
               return (
                 <tr key={index}>
                   <td className={classes}>{item.symbol}</td>
