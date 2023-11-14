@@ -19,6 +19,7 @@ import * as _ from 'lodash';
 import TableInput, { SelectedValue } from './components/TableInput/TableInput';
 import { GET_STOCK, ORB_ALGO } from './constants';
 function App() {
+  const [mtm, setMtm] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [selected_scrips, setSelected_scrips] =
     useState<{ symbol: string; token: string }[]>();
@@ -161,88 +162,98 @@ function App() {
         trade_direction: element.tradeDirection?.toString() || '',
       };
       const res = await runOrb(payload);
-      console.log(res);
+      const mtm = _.get(res, 'mtm', '0') || '0';
+      if (res) setMtm(mtm.toString());
+      else setMtm('0');
     }
   };
   return (
     <div className="App">
-      <Paper
-        elevation={3}
-        style={{
-          padding: '20px',
-          display: 'flex',
-          justifyContent: 'center',
-          flexDirection: 'column',
-        }}
-      >
-        <div className="scripBox">
-          <TextField
-            label="Scrip"
-            variant="standard"
-            disabled={loading}
-            onChange={onScripInputChange}
-            value={scriptInput}
-            fullWidth
-            className="scripTextField"
-          />
-          <Button onClick={fetchDataForAutoComplete} variant="contained">
-            Search
-          </Button>
-        </div>
-        <div>
-          <TableContainer sx={{ maxHeight: 440 }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell>SYMBOL</TableCell>
-                  <TableCell>TOKEN</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {fetchedScrips.length > 0 &&
-                  fetchedScrips.map((row, i) => {
-                    return (
-                      <TableRow key={row.token}>
-                        <TableCell>{row.symbol}</TableCell>
-                        <TableCell>{row.token}</TableCell>
-                        <TableCell>
-                          <Button
-                            id={`${
-                              isSelected(row as rowType) ? 'remove' : 'add'
-                            }_${i}`}
-                            variant="contained"
-                            disabled={false}
-                            color={
-                              isSelected(row as rowType) ? 'error' : 'primary'
-                            }
-                            onClick={(event) => {
-                              onScripAddRemoveClick(event, row as rowType, i);
-                            }}
-                          >
-                            {isSelected(row as rowType) ? (
-                              <DeleteIcon />
-                            ) : (
-                              <AddIcon />
-                            )}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-      </Paper>
-      {Array.isArray(selected_scrips) && selected_scrips.length > 0 && (
-        <TableInput
-          data={selected_scrips}
-          onSubmit={async (data) => {
-            setInterval(() => {
-              scheduleAlgo(data);
-            }, 900000);
+      {mtm === '' && (
+        <Paper
+          elevation={3}
+          style={{
+            padding: '20px',
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
           }}
-        />
+        >
+          <div className="scripBox">
+            <TextField
+              label="Scrip"
+              variant="standard"
+              disabled={loading}
+              onChange={onScripInputChange}
+              value={scriptInput}
+              fullWidth
+              className="scripTextField"
+            />
+            <Button onClick={fetchDataForAutoComplete} variant="contained">
+              Search
+            </Button>
+          </div>
+          <div>
+            <TableContainer sx={{ maxHeight: 440 }}>
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>SYMBOL</TableCell>
+                    <TableCell>TOKEN</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {fetchedScrips.length > 0 &&
+                    fetchedScrips.map((row, i) => {
+                      return (
+                        <TableRow key={row.token}>
+                          <TableCell>{row.symbol}</TableCell>
+                          <TableCell>{row.token}</TableCell>
+                          <TableCell>
+                            <Button
+                              id={`${
+                                isSelected(row as rowType) ? 'remove' : 'add'
+                              }_${i}`}
+                              variant="contained"
+                              disabled={false}
+                              color={
+                                isSelected(row as rowType) ? 'error' : 'primary'
+                              }
+                              onClick={(event) => {
+                                onScripAddRemoveClick(event, row as rowType, i);
+                              }}
+                            >
+                              {isSelected(row as rowType) ? (
+                                <DeleteIcon />
+                              ) : (
+                                <AddIcon />
+                              )}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
+        </Paper>
+      )}
+      {Array.isArray(selected_scrips) &&
+        selected_scrips.length > 0 &&
+        mtm === '' && (
+          <TableInput
+            data={selected_scrips}
+            onSubmit={async (data) => {
+              scheduleAlgo(data);
+              setInterval(() => {
+                scheduleAlgo(data);
+              }, 900000);
+            }}
+          />
+        )}
+      {mtm !== '' && (
+        <div className="text-xl mt-8 w-full text-center">{`MTM: ${mtm}`}</div>
       )}
     </div>
   );
