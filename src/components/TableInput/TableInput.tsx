@@ -3,19 +3,16 @@ import React, { useState } from 'react';
 export interface SelectedValue {
   symbol: string;
   token: string;
-  price?: number;
-  maxSL?: number;
+  price?: string;
+  maxSL?: string;
   tradeDirection?: string;
 }
-
 interface TableComponentProps {
-  data: SelectedValue[] | undefined;
+  data: SelectedValue[];
   onSubmit: (data: SelectedValue[]) => void;
 }
-
 const TableInput: React.FC<TableComponentProps> = ({ data, onSubmit }) => {
   const [editedData, setEditedData] = useState<SelectedValue[]>([]);
-
   const handleInputChange = (
     index: number,
     field: keyof SelectedValue,
@@ -25,11 +22,9 @@ const TableInput: React.FC<TableComponentProps> = ({ data, onSubmit }) => {
     newData[index] = { ...newData[index], [field]: value };
     setEditedData(newData);
   };
-
   const handleSubmit = () => {
     onSubmit(editedData);
   };
-
   return (
     <div>
       <table>
@@ -59,7 +54,17 @@ const TableInput: React.FC<TableComponentProps> = ({ data, onSubmit }) => {
               const classes = isLast
                 ? 'p-4'
                 : 'p-4 border-b border-blue-gray-50';
-              editedData.push({ symbol: item.symbol, token: item.token });
+              const newArray = [...editedData];
+              const existingIndex = newArray.findIndex(
+                (eitem) => eitem.symbol === item.symbol
+              );
+              if (existingIndex === -1) {
+                newArray.push({ symbol: item.symbol, token: item.token });
+                setEditedData(newArray);
+              } else {
+                editedData[existingIndex].symbol = item.symbol;
+                editedData[existingIndex].token = item.token;
+              }
               return (
                 <tr key={index}>
                   <td className={classes}>{item.symbol}</td>

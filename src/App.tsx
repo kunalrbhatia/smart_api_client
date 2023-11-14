@@ -18,15 +18,32 @@ import axios from 'axios';
 import * as _ from 'lodash';
 import TableInput, { SelectedValue } from './components/TableInput/TableInput';
 import { GET_STOCK, ORB_ALGO } from './constants';
+import Credentails, { CredType } from './components/Credentails/Credentails';
+import { isCredFilled } from './utils/functions';
+import FullScreenLoader from './components/FullScreenLoader/FullScreenLoader';
 function App() {
+  const [credCheck, setCredCheck] = useState<boolean>(false);
+  const [cred, setCred] = useState<CredType>({
+    api_key: '',
+    client_code: '',
+    client_pin: '',
+    client_totp_pin: '',
+  });
+  useEffect(() => {
+    const storedCred = localStorage.getItem('credentials');
+    if (storedCred) {
+      const parsedCred: CredType = JSON.parse(storedCred);
+      setCred(parsedCred);
+    }
+  }, []);
   const [mtm, setMtm] = useState<string>('');
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [selected_scrips, setSelected_scrips] =
     useState<{ symbol: string; token: string }[]>();
   const [scriptInput, setScriptInput] = useState<string>('');
   const [fetchedScrips, setFetchedScrips] = useState<rowType[]>([]);
   const runOrb = async (payload: payloadType) => {
-    setLoading(true);
+    setIsLoading(true);
     const config = {
       method: 'post',
       url: ORB_ALGO,
@@ -38,23 +55,23 @@ function App() {
     try {
       return await axios(config)
         .then((response: object) => {
-          setLoading(false);
+          setIsLoading(false);
           console.log(response);
           return response;
         })
         .catch((err) => {
-          setLoading(false);
+          setIsLoading(false);
           console.log(err);
         });
     } catch (err) {
-      setLoading(false);
+      setIsLoading(false);
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
   const fetchDataForAutoComplete = async () => {
-    setLoading(true);
+    setIsLoading(true);
     const payload = JSON.stringify({
       api_key: 'YK4WsJ6X',
       client_code: 'K94372',
@@ -74,18 +91,18 @@ function App() {
       try {
         await axios(config)
           .then((response: object) => {
-            setLoading(false);
+            setIsLoading(false);
             setFetchedScrips(_.get(response, 'data', []) || []);
           })
           .catch((err) => {
-            setLoading(false);
+            setIsLoading(false);
             console.log(err);
           });
       } catch (err) {
-        setLoading(false);
+        setIsLoading(false);
         console.log(err);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     }
   };
@@ -133,9 +150,6 @@ function App() {
       setSelected_scrips(updatedScrips);
     }
   };
-  useEffect(() => {
-    console.log('selected_scrip: ', selected_scrips);
-  }, [selected_scrips]);
   const onScripInputChange = (event: object) => {
     const changedInput = _.get(event, 'target.value', '') || '';
     setScriptInput(changedInput);
@@ -152,10 +166,10 @@ function App() {
     for (let index = 0; index < data.length; index++) {
       const element = data[index];
       const payload: payloadType = {
-        api_key: 'YK4WsJ6X',
-        client_code: 'K94372',
-        client_pin: '5143',
-        client_totp_pin: '2RGK7VSYECJVZTPUN3Q5BGTD44',
+        api_key: cred.api_key,
+        client_code: cred.client_code,
+        client_pin: cred.client_pin,
+        client_totp_pin: cred.client_totp_pin,
         max_sl: element.maxSL?.toString() || '0',
         price: element.price?.toString() || '0',
         script_name: element.symbol.replace(/-EQ$/, ''),
@@ -167,9 +181,26 @@ function App() {
       else setMtm('0');
     }
   };
+  useEffect(() => {
+    setMtm('');
+  }, []);
+  useEffect(() => {
+    if (isCredFilled(cred)) {
+      setCredCheck(true);
+    } else {
+      setCredCheck(false);
+    }
+  }, [cred]);
   return (
     <div className="App">
-      {mtm === '' && (
+      {!credCheck && (
+        <Credentails
+          handleChange={(value, creds) => {
+            setCred(creds);
+          }}
+        />
+      )}
+      {mtm === '' && credCheck && (
         <Paper
           elevation={3}
           style={{
@@ -183,7 +214,7 @@ function App() {
             <TextField
               label="Scrip"
               variant="standard"
-              disabled={loading}
+              disabled={isLoading}
               onChange={onScripInputChange}
               value={scriptInput}
               fullWidth
@@ -252,9 +283,10 @@ function App() {
             }}
           />
         )}
-      {mtm !== '' && (
+      {mtm !== '' && credCheck && (
         <div className="text-xl mt-8 w-full text-center">{`MTM: ${mtm}`}</div>
       )}
+      <FullScreenLoader visible={isLoading} />
     </div>
   );
 }
