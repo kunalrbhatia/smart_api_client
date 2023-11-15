@@ -82,7 +82,7 @@ function App() {
         trade_direction: element.tradeDirection?.toString() || '',
       };
       const res = await runOrb(payload);
-      const mtm = _.get(res, 'mtm', '0') || '0';
+      const mtm = _.get(res, 'data.mtm', '0') || '0';
       if (res) setMtm(mtm.toString());
       else setMtm('0');
     }
