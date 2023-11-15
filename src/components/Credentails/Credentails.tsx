@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
 import { isCredFilled } from '../../utils/functions';
-export type CredType = {
-  api_key: string;
-  client_code: string;
-  client_pin: string;
-  client_totp_pin: string;
-};
-type CredentailsType = {
-  handleChange: (isVerified: boolean, creds: CredType) => void;
-};
+
 const Credentails = ({ handleChange }: CredentailsType) => {
   const [cred, setCred] = useState<CredType>({
     api_key: '',
