@@ -97,6 +97,9 @@ function App() {
       setCredCheck(false);
     }
   }, [cred]);
+  useEffect(() => {
+    document.title = 'ORB Algo';
+  }, []);
   return (
     <div className="App">
       {!credCheck && (
@@ -114,7 +117,6 @@ function App() {
             setIsLoading(value);
           }}
           onChangeSelectedScrips={(value) => {
-            console.log(value);
             setSelectedScrips(value);
           }}
         />
