@@ -101,7 +101,7 @@ function App() {
     document.title = 'ORB Algo';
   }, []);
   return (
-    <div className="App">
+    <div className="App w-full">
       {!credCheck && (
         <Credentails
           handleChange={(value, creds) => {

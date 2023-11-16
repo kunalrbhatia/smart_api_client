@@ -12,7 +12,7 @@ const Credentails = ({ handleChange }: CredentailsType) => {
     localStorage.setItem('credentials', JSON.stringify(cred));
   };
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center h-screen w-[500px] opacity-90">
       <div className="container max-w-md bg-gray-100 p-6 rounded-lg shadow-md">
         <div className="mb-4 flex justify-center">
           <label className="block text-lg font-bold mb-2">
@@ -71,9 +71,9 @@ const Credentails = ({ handleChange }: CredentailsType) => {
             }}
           />
         </div>
-        <div className="mb-4 flex justify-center">
+        <div className="mb-4 flex justify-center w-full">
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
             onClick={() => {
               if (isCredFilled(cred)) {
                 handleChange(true, cred);

@@ -35,8 +35,8 @@ const TableInput: React.FC<TableComponentProps> = ({ data, onSubmit }) => {
     overflow: auto;
     padding: 2rem;
     */
-    <div className="p-8">
-      <div className="item-center flex flex-col max-h-[300px] overflow-auto p-8 bg-white">
+    <>
+      <div className="opacity-90 item-center flex flex-col max-h-[300px] overflow-auto p-8 bg-white mb-4 w-full">
         <table>
           <thead>
             <tr>
@@ -122,15 +122,15 @@ const TableInput: React.FC<TableComponentProps> = ({ data, onSubmit }) => {
           </tbody>
         </table>
       </div>
-      <div className="flex justify-center p-[1rem]">
+      <div className="flex justify-center opacity-90 w-full">
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-[160px]"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
           onClick={handleSubmit}
         >
           Submit
         </button>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,5 +1,9 @@
 .App {
   padding: 20px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 .scripTextField {
   margin-right: 8px !important;
