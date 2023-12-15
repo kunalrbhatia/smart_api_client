@@ -17,6 +17,7 @@ const SearchStock = ({
 }: SearchStockType) => {
   const [scriptInput, setScriptInput] = useState<string>('');
   const [strikeInput, setStrikeInput] = useState<string>('');
+  const [optionType, setOptionType] = useState<string>('PE');
   const [fetchedScrips, setFetchedScrips] = useState<rowType[]>([]);
   const [selectedScrips, setSelectedScrips] = useState<SelectedScripsType[]>(
     []
@@ -45,6 +46,7 @@ const SearchStock = ({
       client_totp_pin: cred.client_totp_pin,
       script_name: scriptInput.toLocaleUpperCase(),
       strike: strikeInput,
+      option_type: optionType,
     });
     const config = {
       method: 'post',
@@ -118,6 +120,16 @@ const SearchStock = ({
             value={strikeInput}
             className="scripTextField w-full border border-gray-300 p-2 mr-2"
           />
+          <select
+            className="bg-gray-50 border mr-2 border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            value={optionType}
+            onChange={(e) => {
+              setOptionType(e.target.value);
+            }}
+          >
+            <option value="PE">PE</option>
+            <option value="CE">CE</option>
+          </select>
           <button
             onClick={fetchDataForAutoComplete}
             className="bg-blue-500 text-white px-4 py-2 rounded"
