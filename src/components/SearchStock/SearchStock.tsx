@@ -16,6 +16,7 @@ const SearchStock = ({
   onChangeSelectedScrips,
 }: SearchStockType) => {
   const [scriptInput, setScriptInput] = useState<string>('');
+  const [strikeInput, setStrikeInput] = useState<string>('');
   const [fetchedScrips, setFetchedScrips] = useState<rowType[]>([]);
   const [selectedScrips, setSelectedScrips] = useState<SelectedScripsType[]>(
     []
@@ -23,6 +24,10 @@ const SearchStock = ({
   const onScripInputChange = (event: object) => {
     const changedInput = _.get(event, 'target.value', '') || '';
     setScriptInput(changedInput);
+  };
+  const onStrikeInputChange = (event: object) => {
+    const changedInput = _.get(event, 'target.value', '') || '';
+    setStrikeInput(changedInput);
   };
   const isSelected = (row: rowType) => {
     if (Array.isArray(selectedScrips)) {
@@ -39,6 +44,7 @@ const SearchStock = ({
       client_pin: cred.client_pin,
       client_totp_pin: cred.client_totp_pin,
       script_name: scriptInput.toLocaleUpperCase(),
+      strike: strikeInput,
     });
     const config = {
       method: 'post',
@@ -102,6 +108,14 @@ const SearchStock = ({
             disabled={isLoading}
             onChange={onScripInputChange}
             value={scriptInput}
+            className="scripTextField w-full border border-gray-300 p-2 mr-2"
+          />
+          <input
+            type="text"
+            placeholder="Strike"
+            disabled={isLoading}
+            onChange={onStrikeInputChange}
+            value={strikeInput}
             className="scripTextField w-full border border-gray-300 p-2 mr-2"
           />
           <button
