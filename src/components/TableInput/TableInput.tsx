@@ -52,9 +52,6 @@ const TableInput: React.FC<TableComponentProps> = ({ data, onSubmit }) => {
               <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
                 Max SL
               </th>
-              <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
-                Trade Direction
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -98,23 +95,6 @@ const TableInput: React.FC<TableComponentProps> = ({ data, onSubmit }) => {
                           handleInputChange(index, 'maxSL', e.target.value)
                         }
                       />
-                    </td>
-                    <td className={classes}>
-                      <select
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        value={editedData[index]?.tradeDirection || ''}
-                        onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            'tradeDirection',
-                            e.target.value
-                          )
-                        }
-                      >
-                        <option value="">Select</option>
-                        <option value="up">Up</option>
-                        <option value="down">Down</option>
-                      </select>
                     </td>
                   </tr>
                 );

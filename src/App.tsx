@@ -65,10 +65,14 @@ function App() {
     script_name: string;
     price: string;
     max_sl: string;
-    trade_direction: string;
   };
-
-  const scheduleAlgo = async (data: SelectedValue[]) => {
+  const fetchMTM = async () => {
+    await setTimeout(() => {
+      console.log('force wait for 2 secs ...');
+    }, 2000);
+    return Promise.resolve('0');
+  };
+  const runAlgo = async (data: SelectedValue[]) => {
     for (let index = 0; index < data.length; index++) {
       const element = data[index];
       const payload: payloadType = {
@@ -78,8 +82,7 @@ function App() {
         client_totp_pin: cred.client_totp_pin,
         max_sl: element.maxSL?.toString() || '0',
         price: element.price?.toString() || '0',
-        script_name: element.symbol.replace(/-EQ$/, ''),
-        trade_direction: element.tradeDirection?.toString() || '',
+        script_name: element.symbol.toString(),
       };
       const res = await runOrb(payload);
       const mtm = _.get(res, 'data.mtm', '0') || '0';
@@ -127,10 +130,11 @@ function App() {
           <TableInput
             data={selectedScrips}
             onSubmit={async (data) => {
-              scheduleAlgo(data);
-              setInterval(() => {
-                scheduleAlgo(data);
-              }, 900000);
+              runAlgo(data);
+              setInterval(async () => {
+                const mtm = await fetchMTM();
+                setMtm(mtm);
+              }, 60000);
             }}
           />
         )}
