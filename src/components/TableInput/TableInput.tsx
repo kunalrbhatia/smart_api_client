@@ -5,7 +5,7 @@ export interface SelectedValue {
   token: string;
   price?: string;
   maxSL?: string;
-  tradeDirection?: string;
+  tsl?: string;
 }
 interface TableComponentProps {
   data: SelectedValue[];
@@ -52,6 +52,9 @@ const TableInput: React.FC<TableComponentProps> = ({ data, onSubmit }) => {
               <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
                 Max SL
               </th>
+              <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
+                Trailing SL
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -93,6 +96,16 @@ const TableInput: React.FC<TableComponentProps> = ({ data, onSubmit }) => {
                         value={editedData[index]?.maxSL || ''}
                         onChange={(e) =>
                           handleInputChange(index, 'maxSL', e.target.value)
+                        }
+                      />
+                    </td>
+                    <td className={classes}>
+                      <input
+                        type="number"
+                        className="bg-white border-2 border-gray-300 rounded-md p-2  max-w-[160px] text-center"
+                        value={editedData[index]?.tsl || ''}
+                        onChange={(e) =>
+                          handleInputChange(index, 'tsl', e.target.value)
                         }
                       />
                     </td>

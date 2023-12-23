@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios';
-import * as _ from 'lodash';
 import TableInput, { SelectedValue } from './components/TableInput/TableInput';
 import { ORB_ALGO } from './constants';
 import Credentails from './components/Credentails/Credentails';
@@ -9,6 +8,7 @@ import { isCredFilled } from './utils/functions';
 import FullScreenLoader from './components/FullScreenLoader/FullScreenLoader';
 import SearchStock from './components/SearchStock/SearchStock';
 import { SelectedScripsType } from 'typings/search-stock';
+import _get from 'lodash/get';
 function App() {
   const [credCheck, setCredCheck] = useState<boolean>(false);
   const [cred, setCred] = useState<CredType>({
@@ -56,15 +56,19 @@ function App() {
       setIsLoading(false);
     }
   };
-
+  type scrip = {
+    token: string;
+    name: string;
+    price: string | undefined;
+    sl: string | undefined;
+    tsl: string | undefined;
+  };
   type payloadType = {
     api_key: string;
     client_code: string;
     client_pin: string;
     client_totp_pin: string;
-    script_name: string;
-    price: string;
-    max_sl: string;
+    scrips: scrip[];
   };
   const fetchMTM = async () => {
     await setTimeout(() => {
@@ -72,23 +76,27 @@ function App() {
     }, 2000);
     return Promise.resolve('0');
   };
-  const runAlgo = async (data: SelectedValue[]) => {
-    for (let index = 0; index < data.length; index++) {
-      const element = data[index];
-      const payload: payloadType = {
-        api_key: cred.api_key,
-        client_code: cred.client_code,
-        client_pin: cred.client_pin,
-        client_totp_pin: cred.client_totp_pin,
-        max_sl: element.maxSL?.toString() || '0',
-        price: element.price?.toString() || '0',
-        script_name: element.symbol.toString(),
+  const runAlgo = async (selectedValues: SelectedValue[]) => {
+    const scrips = selectedValues.map((selectedValue) => {
+      return {
+        token: selectedValue.token,
+        name: selectedValue.symbol,
+        price: selectedValue.price,
+        sl: selectedValue.maxSL,
+        tsl: selectedValue.tsl,
       };
-      const res = await runOrb(payload);
-      const mtm = _.get(res, 'data.mtm', '0') || '0';
-      if (res) setMtm(mtm.toString());
-      else setMtm('0');
-    }
+    });
+    const payload: payloadType = {
+      api_key: cred.api_key,
+      client_code: cred.client_code,
+      client_pin: cred.client_pin,
+      client_totp_pin: cred.client_totp_pin,
+      scrips: scrips,
+    };
+    const res = await runOrb(payload);
+    const mtm = _get(res, 'data.mtm', '0') || '0';
+    if (res) setMtm(mtm.toString());
+    else setMtm('0');
   };
   useEffect(() => {
     setMtm('');
