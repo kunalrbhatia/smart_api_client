@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios';
 import TableInput, { SelectedValue } from './components/TableInput/TableInput';
-import { ORB_ALGO } from './constants';
+import { KILL_ALGO, ORB_ALGO } from './constants';
 import Credentails from './components/Credentails/Credentails';
 import { isCredFilled } from './utils/functions';
 import FullScreenLoader from './components/FullScreenLoader/FullScreenLoader';
@@ -98,6 +98,33 @@ function App() {
     if (res) setMtm(mtm.toString());
     else setMtm('0');
   };
+  const handleStopAlgo = async () => {
+    setIsLoading(true);
+    const config = {
+      method: 'get',
+      url: KILL_ALGO,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    try {
+      return await axios(config)
+        .then((response: object) => {
+          setIsLoading(false);
+          console.log(response);
+          return response;
+        })
+        .catch((err) => {
+          setIsLoading(false);
+          console.log(err);
+        });
+    } catch (err) {
+      setIsLoading(false);
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   useEffect(() => {
     setMtm('');
   }, []);
@@ -147,7 +174,17 @@ function App() {
           />
         )}
       {mtm !== '' && credCheck && (
-        <div className="text-xl mt-8 w-full text-center">{`MTM: ${mtm}`}</div>
+        <>
+          <div className="text-xl mt-8 w-full text-center">{`MTM: ${mtm}`}</div>
+          <div className="flex justify-center opacity-90 w-full">
+            <button
+              className="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+              onClick={handleStopAlgo}
+            >
+              Stop Algo
+            </button>
+          </div>
+        </>
       )}
       <FullScreenLoader visible={isLoading} />
     </div>
