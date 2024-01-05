@@ -16,5 +16,8 @@ COPY . .
 # Build your React app (replace 'build' with your actual build command)
 RUN npm run build
 
-# Specify the command to run your app when the container starts
-CMD ["npm", "start"]
+# Install 'serve' globally to serve static files
+RUN npm install -g serve
+
+# Specify the command to serve your production build
+CMD ["serve", "-s", "build"]
